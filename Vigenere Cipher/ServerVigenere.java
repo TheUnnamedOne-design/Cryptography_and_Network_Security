@@ -25,9 +25,8 @@ class Vigenere
 
         for (int i = 0; i < plaintext.length(); i++)
         {
-            int x = (plaintext.charAt(i) + generatedKey.charAt(i)) % 26;
-            x += 'A';
-            cipher += (char)(x);
+            int x = ((plaintext.charAt(i) - 'A') + (generatedKey.charAt(i) - 'A')) % 26;
+            cipher += (char)(x + 'A');
         }
         return cipher;
     }
@@ -40,9 +39,8 @@ class Vigenere
 
         for (int i = 0; i < ciphertext.length(); i++)
         {
-            int x = (ciphertext.charAt(i) - generatedKey.charAt(i) + 26) % 26;
-            x += 'A';
-            original += (char)(x);
+            int x = ((ciphertext.charAt(i) - 'A') - (generatedKey.charAt(i) - 'A') + 26) % 26;
+            original += (char)(x + 'A');
         }
         return original;
     }
