@@ -8,16 +8,11 @@ class Vigenere
 
     static String generateKey(String str, String key)
     {
-        int x = str.length();
-        StringBuilder newKey = new StringBuilder(key);
-
-        for (int i = 0; ; i++)
+        StringBuilder newKey = new StringBuilder();
+        
+        for (int i = 0; i < str.length(); i++)
         {
-            if (x == i)
-                i = 0;
-            if (newKey.length() == str.length())
-                break;
-            newKey.append(key.charAt(i));
+            newKey.append(key.charAt(i % key.length()));
         }
         return newKey.toString();
     }
