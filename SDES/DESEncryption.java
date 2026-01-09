@@ -142,54 +142,92 @@ public class DESEncryption
 
 
 
-    String decrypt(String s)
-    {
-        String ans="";
-        return ans;
-    }
-
-
-
+    
+    
+    
     String encrypt(String message)
     {
         String messages[]=message.split("\\s+");
         String plaintext=messages[0];
         String ciphertext=messages[1];
-
+        
         
         ArrayList<String> keys=key_generate(ciphertext);
         String encryptedtext="";
-
+        
         int initial_permutation[]={2,6,3,1,4,8,5,7};
         int final_permutation[]={4,1,3,5,7,2,8,6};
-
-
-        String s1="";
-
-        for(int i=0;i<initial_permutation.length;i++)
-        {
-            s1+=plaintext.charAt(initial_permutation[i]-1);
-        }
-
-
-        String s2=f_key(s1, keys.get(0));
-       // System.out.println("f_k1 : "+s2);
-
-        String s3=s2.substring(4)+s2.substring(0,4);
-
-        String s4=f_key(s3,keys.get(1));
-
-        //System.out.println("f_k2 : "+s4);
-
-
-        for(int i=0;i<final_permutation.length;i++)
-        {
-            encryptedtext+=s4.charAt(final_permutation[i]-1);
-        }
         
-        return encryptedtext;
-    }
+        
+        String s1="";
+        
+        for(int i=0;i<initial_permutation.length;i++)
+            {
+                s1+=plaintext.charAt(initial_permutation[i]-1);
+            }
+            
+            
+            String s2=f_key(s1, keys.get(0));
+            // System.out.println("f_k1 : "+s2);
+            
+            String s3=s2.substring(4)+s2.substring(0,4);
+            
+            String s4=f_key(s3,keys.get(1));
+            
+            //System.out.println("f_k2 : "+s4);
+            
+            
+            for(int i=0;i<final_permutation.length;i++)
+                {
+                    encryptedtext+=s4.charAt(final_permutation[i]-1);
+                }
+                
+                return encryptedtext;
+            }
+            
 
 
 
-}
+            
+            String decrypt(String message)
+            {
+               String messages[]=message.split("\\s+");
+                String plaintext=messages[0];
+                String ciphertext=messages[1];
+
+                
+                ArrayList<String> keys=key_generate(ciphertext);
+                String decryptedtext="";
+
+                int initial_permutation[]={2,6,3,1,4,8,5,7};
+                int final_permutation[]={4,1,3,5,7,2,8,6};
+
+
+                String s1="";
+
+                for(int i=0;i<initial_permutation.length;i++)
+                {
+                    s1+=plaintext.charAt(initial_permutation[i]-1);
+                }
+
+
+                String s2=f_key(s1, keys.get(1));
+            // System.out.println("f_k1 : "+s2);
+
+                String s3=s2.substring(4)+s2.substring(0,4);
+
+                String s4=f_key(s3,keys.get(2));
+
+                //System.out.println("f_k2 : "+s4);
+
+
+                for(int i=0;i<final_permutation.length;i++)
+                {
+                    decryptedtext+=s4.charAt(final_permutation[i]-1);
+                }
+                
+                return decryptedtext;
+            }
+            
+            
+        }
