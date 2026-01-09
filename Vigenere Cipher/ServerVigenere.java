@@ -1,12 +1,11 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 class Vigenere
 {
     static String key = "SECRET";
 
-    static String generateKey(String str, String key)
+    String generateKey(String str, String key)
     {
         StringBuilder newKey = new StringBuilder();
         
