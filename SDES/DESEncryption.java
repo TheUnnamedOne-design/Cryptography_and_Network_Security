@@ -120,6 +120,26 @@ public class DESEncryption
     }
 
 
+    static String f_key(String word,String key)
+    {
+        String L=word.substring(0,4);
+        String R=word.substring(4);
+
+        String ans="";
+        String F_result=F(R,key);
+
+        String NL="";
+        for(int i=0;i<4;i++)
+        {
+            if(F_result.charAt(i)!=L.charAt(i)) NL+="1";
+            else NL+="0";
+        }
+
+        ans=NL+R;
+        return ans;
+    }
+
+
 
 
     String decrypt(String s)
@@ -148,14 +168,25 @@ public class DESEncryption
 
         for(int i=0;i<initial_permutation.length;i++)
         {
-            s1+=plaintext.charAt(initial_permutation[i]);
+            s1+=plaintext.charAt(initial_permutation[i]-1);
         }
 
 
-        System.out.println(F("0010","11101001"));
+        String s2=f_key(s1, keys.get(0));
+       // System.out.println("f_k1 : "+s2);
+
+        String s3=s2.substring(4)+s2.substring(0,4);
+
+        String s4=f_key(s3,keys.get(1));
+
+        //System.out.println("f_k2 : "+s4);
+
+
+        for(int i=0;i<final_permutation.length;i++)
+        {
+            encryptedtext+=s4.charAt(final_permutation[i]-1);
+        }
         
-
-
         return encryptedtext;
     }
 
