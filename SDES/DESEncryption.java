@@ -182,13 +182,13 @@ public class DESEncryption
                     encryptedtext+=s4.charAt(final_permutation[i]-1);
                 }
                 
-                return encryptedtext;
+                return encryptedtext+" "+ciphertext;
             }
             
 
 
 
-            
+
             String decrypt(String message)
             {
                String messages[]=message.split("\\s+");
@@ -216,7 +216,7 @@ public class DESEncryption
 
                 String s3=s2.substring(4)+s2.substring(0,4);
 
-                String s4=f_key(s3,keys.get(2));
+                String s4=f_key(s3,keys.get(0));
 
                 //System.out.println("f_k2 : "+s4);
 

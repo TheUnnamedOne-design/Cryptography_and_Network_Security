@@ -16,16 +16,17 @@ public class ServerEncryption
             DataInputStream in=new DataInputStream(socket.getInputStream());
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
+            DESEncryption des=new DESEncryption();
 
             try
             {
                 while (true) {
 
                 s=in.readUTF();
-                System.out.println("Client : "+s);
-                s=br.readLine();
+                System.out.println("Client Received : "+s);
+                s=des.decrypt(s);
                 out.writeUTF(s);
-                System.out.println("Server : "+s);
+                System.out.println("Server Decrypted : "+s);
                 }
             }
             catch(Exception e)
