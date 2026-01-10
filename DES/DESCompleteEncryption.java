@@ -223,18 +223,18 @@ public class DESCompleteEncryption
     }
 
 
-    // Convert text to 64-bit binary (8 characters = 64 bits)
+    
     static String textToBinary(String text)
     {
-        // Pad or truncate to exactly 8 characters
+        
         if(text.length() < 8)
         {
-            // Pad with spaces
+            
             text = String.format("%-8s", text);
         }
         else if(text.length() > 8)
         {
-            // Truncate to 8 characters
+            
             text = text.substring(0, 8);
         }
         
@@ -247,7 +247,7 @@ public class DESCompleteEncryption
         return binary;
     }
     
-    // Convert 64-bit binary to text (8 characters)
+    
     static String binaryToText(String binary)
     {
         String text = "";
@@ -291,7 +291,7 @@ public class DESCompleteEncryption
         String plaintextInput=messages[0];
         String keyInput=messages[1];
         
-        // Convert text to 64-bit binary
+        
         String plaintext = textToBinary(plaintextInput);
         String keyBinary = textToBinary(keyInput);
         
@@ -421,7 +421,7 @@ public class DESCompleteEncryption
                     decryptedtext+=current.charAt(final_permutation[i]-1);
                 }
                 
-                // Convert binary back to text
+                
                 String decryptedTextOutput = binaryToText(decryptedtext);
                 return decryptedTextOutput;
             }
