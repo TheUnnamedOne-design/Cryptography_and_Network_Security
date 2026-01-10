@@ -23,7 +23,11 @@ public class ClientEncryption
             try
             {
                 while (true) { 
-                s=br.readLine();
+                System.out.print("Enter plain text: ");
+                String s1=br.readLine();
+                System.out.print("Enter key : ");
+                String s2=br.readLine();
+                s=s1+" "+s2;
                 s=des.encrypt(s);
                 out.writeUTF(s);
                 System.out.println("Client : "+s);

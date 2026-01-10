@@ -24,6 +24,10 @@ public class ServerEncryption
 
                 s=in.readUTF();
                 System.out.println("Client Received : "+s);
+                System.out.print("Enter key : ");
+                String key=br.readLine();
+                key=des.textToBinary(key);
+                s=s+" "+key;
                 s=des.decrypt(s);
                 out.writeUTF(s);
                 System.out.println("Server Decrypted : "+s);

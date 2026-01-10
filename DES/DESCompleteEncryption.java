@@ -277,12 +277,11 @@ public class DESCompleteEncryption
 
         ans=NL+R;
         return ans;
+        
     }
 
 
 
-
-    
     
     
     String encrypt(String message)
@@ -351,7 +350,7 @@ public class DESCompleteEncryption
                     encryptedtext+=current.charAt(final_permutation[i]-1);
                 }
                 
-                return encryptedtext+" "+keyBinary;
+                return encryptedtext;
             }
             
 
