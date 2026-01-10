@@ -16,7 +16,7 @@ public class ServerEncryption
             DataInputStream in=new DataInputStream(socket.getInputStream());
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
-            DESEncryption des=new DESEncryption();
+            SDESEncryption des=new SDESEncryption();
 
             try
             {
@@ -24,6 +24,9 @@ public class ServerEncryption
 
                 s=in.readUTF();
                 System.out.println("Client Received : "+s);
+                System.out.print("Enter key : ");
+                String key=br.readLine();
+                s=s+" "+key;
                 s=des.decrypt(s);
                 out.writeUTF(s);
                 System.out.println("Server Decrypted : "+s);

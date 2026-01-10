@@ -18,12 +18,16 @@ public class ClientEncryption
             DataInputStream in=new DataInputStream(socket.getInputStream());
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
-            DESEncryption des=new DESEncryption();
+            SDESEncryption des=new SDESEncryption();
 
             try
             {
                 while (true) { 
-                s=br.readLine();
+                System.out.print("Enter plain text: ");
+                String s1=br.readLine();
+                System.out.print("Enter key : ");
+                String s2=br.readLine();
+                s=s1+" "+s2;
                 s=des.encrypt(s);
                 out.writeUTF(s);
                 System.out.println("Client : "+s);

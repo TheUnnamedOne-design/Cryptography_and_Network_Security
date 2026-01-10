@@ -1,5 +1,5 @@
 import java.util.*;
-public class DESEncryption
+public class SDESEncryption
 {
 
     static String shift(String s,int k)
@@ -149,10 +149,10 @@ public class DESEncryption
     {
         String messages[]=message.split("\\s+");
         String plaintext=messages[0];
-        String ciphertext=messages[1];
+        String key=messages[1];
         
         
-        ArrayList<String> keys=key_generate(ciphertext);
+        ArrayList<String> keys=key_generate(key);
         String encryptedtext="";
         
         int initial_permutation[]={2,6,3,1,4,8,5,7};
@@ -182,7 +182,7 @@ public class DESEncryption
                     encryptedtext+=s4.charAt(final_permutation[i]-1);
                 }
                 
-                return encryptedtext+" "+ciphertext;
+                return encryptedtext;
             }
             
 
@@ -192,11 +192,11 @@ public class DESEncryption
             String decrypt(String message)
             {
                String messages[]=message.split("\\s+");
-                String plaintext=messages[0];
-                String ciphertext=messages[1];
+                String ciphertext=messages[0];
+                String key=messages[1];
 
                 
-                ArrayList<String> keys=key_generate(ciphertext);
+                ArrayList<String> keys=key_generate(key);
                 String decryptedtext="";
 
                 int initial_permutation[]={2,6,3,1,4,8,5,7};
@@ -207,7 +207,7 @@ public class DESEncryption
 
                 for(int i=0;i<initial_permutation.length;i++)
                 {
-                    s1+=plaintext.charAt(initial_permutation[i]-1);
+                    s1+=ciphertext.charAt(initial_permutation[i]-1);
                 }
 
 
