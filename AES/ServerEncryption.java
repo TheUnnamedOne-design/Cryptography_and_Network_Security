@@ -25,7 +25,7 @@ public class ServerEncryption
                 s=in.readUTF();
                 System.out.println("Client Received : "+s);
                 System.out.print("Enter key : ");
-                String key="mysecretpassword";
+                String key=br.readLine();
                 key=aes.textToHex(key);
                 s=s+" "+key;
                 s=aes.decrypt(s);

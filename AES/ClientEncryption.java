@@ -26,7 +26,7 @@ public class ClientEncryption
                 System.out.print("Enter plain text: ");
                 String s1=br.readLine();
                 System.out.print("Enter key : ");
-                String s2="mysecretpassword";
+                String s2=br.readLine();
                 s=s1+" "+s2;
                 s=aes.encrypt(s);
                 out.writeUTF(s);
