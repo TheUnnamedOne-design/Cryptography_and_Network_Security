@@ -322,12 +322,12 @@ public class AES
     }
 
 
-    static String[] KeyExpansion(String s)
+    static String[][][] KeyExpansion(String s)
     {
 
-        String AllKeys[]=new String[10];
+        String AllKeys[][][]=new String[10][4][4];
         String km[][]=new String[4][4];
-        String words[][]=new String[4][4];
+        String words[][]=new String[44][4];
         int ctr=0;
 
 
@@ -367,7 +367,7 @@ public class AES
             String plaintext = textToHex(plaintextInput);
             String keyHex = textToHex(keyInput);
 
-            String AllRoundKeys[]=KeyExpansion(keyHex);
+            String AllRoundKeys[][][]=KeyExpansion(keyHex);
         
             //System.out.println("plaintext : "+plaintext+"| KeyHex : "+keyHex);
 
