@@ -278,6 +278,37 @@ public class AES
 
         return AnswerMatrix;
     }
+
+
+    static String[] KeyExpansion(String s)
+    {
+
+        String AllKeys[]=new String[10];
+        String km[][]=new String[4][4];
+        int ctr=0;
+
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                String hold=s.substring(ctr,ctr+2);
+                km[j][i]=hold;
+                ctr+=2;
+            }
+        }
+
+        // for(int i=0;i<4;i++)
+        // {
+        //     for(int j=0;j<4;j++)
+        //     {
+        //         System.out.print(km[i][j]+" ");
+        //     }
+        //     System.out.println();
+        // }
+
+        return AllKeys;
+    }
+
     
     String encrypt(String message)
     {
@@ -289,27 +320,48 @@ public class AES
             
             String plaintext = textToHex(plaintextInput);
             String keyHex = textToHex(keyInput);
+
+            String AllRoundKeys[]=KeyExpansion(keyHex);
         
-            System.out.println("plaintext : "+plaintext+"| KeyHex : "+keyHex);
+            //System.out.println("plaintext : "+plaintext+"| KeyHex : "+keyHex);
 
-            String matrix[][]=StateArray(plaintext,keyHex);
-
-            
-            matrix=SubstituteBytes(matrix);
+            //String matrix[][]=StateArray(plaintext,keyHex);
 
             
+           // matrix=SubstituteBytes(matrix);
+
+            // for(int i=0;i<4;i++)
+            //  {
+            //      for(int j=0;j<4;j++)
+            //      {
+            //          System.out.print(matrix[i][j]+" ");
+            //      }
+            //      System.out.println();
+            //  }
+
             
-             matrix=ShiftRows(matrix);
+            
+             //matrix=ShiftRows(matrix);
+
+            //  for(int i=0;i<4;i++)
+            //  {
+            //      for(int j=0;j<4;j++)
+            //      {
+            //          System.out.print(matrix[i][j]+" ");
+            //      }
+            //      System.out.println();
+            //  }
              
-             matrix=MixColumns(matrix);
-             for(int i=0;i<4;i++)
-             {
-                 for(int j=0;j<4;j++)
-                 {
-                     System.out.print(matrix[i][j]+" ");
-                 }
-                 System.out.println();
-             }
+             //matrix=MixColumns(matrix);
+
+            //  for(int i=0;i<4;i++)
+            //  {
+            //      for(int j=0;j<4;j++)
+            //      {
+            //          System.out.print(matrix[i][j]+" ");
+            //      }
+            //      System.out.println();
+            //  }
 
             return encryptedtext;
         }
