@@ -55,49 +55,7 @@ public class AES
     }
 
 
-    static String HexToBinary(String a)
-    {
-        int val=Integer.parseInt(a,16);
-        String b=String.format("%8s", Integer.toBinaryString(val)).replaceAll(" ", "0");
-        if(b.length()>8)
-        {
-            b=b.substring(b.length()-8);
-        }
-        return b;
-    }
-
-
-    static String[][] StateArray(String pt,String key)
-    {
-        String stateMatrix[][]=new String[4][4];
-        int i=0;
-        for(int k=0;k<4;k++)
-        {
-            for(int j=0;j<4;j++)
-            {
-                String as1=HexToBinary(String.valueOf(pt.charAt(i)));
-                String as2=HexToBinary(String.valueOf(pt.charAt(i+1)));
-                String bs1=HexToBinary(String.valueOf(key.charAt(i)));
-                String bs2=HexToBinary(String.valueOf(key.charAt(i+1)));
-
-                String f1=BinaryXOR(as1,bs1);
-                String f2=BinaryXOR(as2,bs2);
-
-                int ans1=Integer.parseInt(f1,2);
-                int ans2=Integer.parseInt(f2,2);
-
-                String fans1=Integer.toHexString(ans1);
-                String fans2=Integer.toHexString(ans2);
-
-                String completeString=fans1+fans2;
-
-                stateMatrix[j][k]=completeString;
-                i+=2;
-
-            }
-        }
-        return stateMatrix;
-    }
+    
 
 
     static String SBOXFunction(int i,int j)
@@ -144,32 +102,18 @@ public class AES
     }
     
 
-    static String[][] ShiftRows(String matrix[][])
+    static String[][] ShiftRows(String[][] state)
     {
-        for(int i=1;i<4;i++)
+        for (int r=1; r<4; r++)
         {
-            int d=i%4;
-            
-            for(int j=0,k=d-1;j<k;j++,k--)
+            String[] temp = new String[4];
+            for (int c=0; c<4; c++)
             {
-                String t=matrix[i][j];
-                matrix[i][j]=matrix[i][k];
-                matrix[i][k]=t;
+                temp[c]=state[r][(c+r) % 4];
             }
-            for(int j=d,k=4-1;j<k;j++,k--)
-            {
-                String t=matrix[i][j];
-                matrix[i][j]=matrix[i][k];
-                matrix[i][k]=t;
-            }
-            for(int j=0,k=4-1;j<k;j++,k--)
-            {
-                String t=matrix[i][j];
-                matrix[i][j]=matrix[i][k];
-                matrix[i][k]=t;
-            }
+            state[r] = temp;
         }
-        return matrix;
+        return state;
     }
 
     static int[] HexToBinaryMultiplication(String a,String b)
@@ -246,7 +190,7 @@ public class AES
         int ans[]=new int[9];
 
         String AnswerMatrix[][]=new String[4][4];
-
+        int irreducible[]={1,0,0,0,1,1,0,1,1};
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
@@ -264,21 +208,22 @@ public class AES
                     else ans[x]=1;
                 }
                 
-                int irreducible[]={1,0,0,0,1,1,0,1,1};
-                for(int x=0;x<9;x++)
+                
+                while(ans[0]==1)
                 {
-                    ans[x]=ans[x]^irreducible[x];
+                    for(int x=0;x<9;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x];
+                    }
                 }
 
                 String hold="";
                 for(int x=1;x<9;x++)
                 {
-                    hold+=Integer.toBinaryString(ans[x]);
+                    hold += ans[x];
                 }
                 int value=Integer.parseInt(hold,2);
-                String finalHex=Integer.toHexString(value);
-
-                AnswerMatrix[i][j]=finalHex;
+                AnswerMatrix[i][j]=String.format("%02x", value);
             }
         }
 
@@ -303,31 +248,19 @@ public class AES
             int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
 
             ans[i]=SBOXFunction(lv, rv);
-            int hold=Integer.parseInt(ans[i],16);
-            String str=String.format("%8s",Integer.toBinaryString(hold)).replaceAll(" ", "0");
-            ans[i]=str;
         }
 
-        int index=round-1;
+        int[] RCON = {
+                0x01,0x02,0x04,0x08,0x10,
+                0x20,0x40,0x80,0x1B,0x36
+            };
 
-        int v2=1<<index;
-        String binV=String.format("%8s",Integer.toBinaryString(v2)).replaceAll(" ", "0");
-
-        String intermediate="";
-        for(int i=0;i<8;i++)
-        {
-            if(binV.charAt(i)!=ans[0].charAt(i)) intermediate+="1";
-            else intermediate+="0";
-        }
-        int value=Integer.parseInt(intermediate,2);
-        String hex=Integer.toHexString(value);
-        ans[0]=hex;
+        int val0 = Integer.parseInt(ans[0], 16) ^ RCON[round - 1];
+        ans[0] = String.format("%02x", val0);
 
         for(int i=1;i<4;i++)
         {
-            value=Integer.parseInt(ans[i],2);
-            hex=Integer.toHexString(value);
-            ans[i]=hex;
+            ans[i] = String.format("%02x", Integer.parseInt(ans[i], 16));
         }
         return  ans;
     }
@@ -414,6 +347,51 @@ public class AES
         return AllKeys;
     }
 
+
+    static String HexToBinary(String a)
+    {
+        int val=Integer.parseInt(a,16);
+        String b=String.format("%8s", Integer.toBinaryString(val)).replaceAll(" ", "0");
+        if(b.length()>8)
+        {
+            b=b.substring(b.length()-8);
+        }
+        return b;
+    }
+
+
+            static String[][] StateArray(String pt)
+            {
+                String[][] state=new String[4][4];
+                int idx=0;
+
+                for (int j=0;j<4;j++)
+                {
+                    for (int i=0; i<4; i++)
+                    {
+                        state[i][j] = pt.substring(idx, idx + 2);
+                        idx += 2;
+                    }
+                }
+                return state;
+            }
+
+
+            static String[][] AddRoundKey(String[][] state, String[][] roundKey)
+            {
+                for (int i=0; i<4; i++)
+                {
+                    for (int j=0; j<4; j++)
+                    {
+                        int s = Integer.parseInt(state[i][j], 16);
+                        int k = Integer.parseInt(roundKey[i][j], 16);
+                        state[i][j] = String.format("%02x", s ^ k);
+                    }
+                }
+                return state;
+            }
+
+
     
     String encrypt(String message)
     {
@@ -427,64 +405,123 @@ public class AES
             String keyHex = textToHex(keyInput);
 
             String AllRoundKeys[][][]=KeyExpansion(keyHex);
+            String matrix[][]=new String[4][4];
 
-            
+            String key0[][]=StateArray(keyHex);
 
-            for (int round = 0; round < AllRoundKeys.length; round++)
+            matrix = StateArray(plaintext);
+            matrix = AddRoundKey(matrix, key0);
+
+
+            for(int i=0;i<9;i++)
             {
-                System.out.println("Round Key " + (round + 1) + ":");
+                matrix=SubstituteBytes(matrix);
+                matrix=ShiftRows(matrix);
+                matrix=MixColumns(matrix);
 
-                for (int row = 0; row < 4; row++)
+
+                for(int j=0;j<4;j++)
                 {
-                    for (int col = 0; col < 4; col++)
+                    for(int k=0;k<4;k++)
                     {
-                        System.out.print(AllRoundKeys[round][row][col] + " ");
-                    }
-                    System.out.println();
+                        int v1=Integer.parseInt(matrix[j][k],16);
+                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
+                        int v=v1^v2;
+                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
+                        matrix[j][k]=ans;
+                    }   
+                }
+            }
+
+            matrix=SubstituteBytes(matrix);
+            matrix=ShiftRows(matrix);
+            int i=9;
+            for(int j=0;j<4;j++)
+                {
+                    for(int k=0;k<4;k++)
+                    {
+                        int v1=Integer.parseInt(matrix[j][k],16);
+                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
+                        int v=v1^v2;
+                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
+                        matrix[j][k]=ans;
+                    }   
                 }
 
-                System.out.println();
+            for(i=0;i<4;i++)
+            {
+                for(int j=0;j<4;j++)
+                {
+                    encryptedtext+=matrix[j][i];
+                }
             }
-        
-            //System.out.println("plaintext : "+plaintext+"| KeyHex : "+keyHex);
 
-            //String matrix[][]=StateArray(plaintext,keyHex);
+            return encryptedtext;
+        }
 
-            
-           // matrix=SubstituteBytes(matrix);
 
-            // for(int i=0;i<4;i++)
-            //  {
-            //      for(int j=0;j<4;j++)
-            //      {
-            //          System.out.print(matrix[i][j]+" ");
-            //      }
-            //      System.out.println();
-            //  }
-
+        String decrypt(String message)
+    {
+            String messages[]=message.split("\\s+");
+            String plaintextInput=messages[0];
+            String keyInput=messages[1];
+            String encryptedtext="";
             
             
-             //matrix=ShiftRows(matrix);
+            String plaintext = textToHex(plaintextInput);
+            String keyHex = textToHex(keyInput);
 
-            //  for(int i=0;i<4;i++)
-            //  {
-            //      for(int j=0;j<4;j++)
-            //      {
-            //          System.out.print(matrix[i][j]+" ");
-            //      }
-            //      System.out.println();
-            //  }
-             
-             //matrix=MixColumns(matrix);
+            String AllRoundKeys[][][]=KeyExpansion(keyHex);
+            String matrix[][]=new String[4][4];
 
-            //  for(int i=0;i<4;i++)
-            //  {
-            //      for(int j=0;j<4;j++)
-            //      {
-            //          System.out.print(matrix[i][j]+" ");
-            //      }
-            //      System.out.println();
-            //  }
+            String key0[][]=StateArray(keyHex);
+
+            matrix = StateArray(plaintext);
+            matrix = AddRoundKey(matrix, key0);
+
+
+            for(int i=0;i<9;i++)
+            {
+                matrix=SubstituteBytes(matrix);
+                matrix=ShiftRows(matrix);
+                matrix=MixColumns(matrix);
+
+
+                for(int j=0;j<4;j++)
+                {
+                    for(int k=0;k<4;k++)
+                    {
+                        int v1=Integer.parseInt(matrix[j][k],16);
+                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
+                        int v=v1^v2;
+                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
+                        matrix[j][k]=ans;
+                    }   
+                }
+            }
+
+            matrix=SubstituteBytes(matrix);
+            matrix=ShiftRows(matrix);
+            int i=9;
+            for(int j=0;j<4;j++)
+                {
+                    for(int k=0;k<4;k++)
+                    {
+                        int v1=Integer.parseInt(matrix[j][k],16);
+                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
+                        int v=v1^v2;
+                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
+                        matrix[j][k]=ans;
+                    }   
+                }
+
+            for(i=0;i<4;i++)
+            {
+                for(int j=0;j<4;j++)
+                {
+                    encryptedtext+=matrix[j][i];
+                }
+            }
 
             return encryptedtext;
         }
