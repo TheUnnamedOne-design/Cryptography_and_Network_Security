@@ -28,7 +28,7 @@ public class ServerEncryption
                 String key="mysecretpassword";
                 key=aes.textToHex(key);
                 s=s+" "+key;
-                //s=des.decrypt(s);
+                s=aes.decrypt(s);
                 out.writeUTF(s);
                 System.out.println("Server Decrypted : "+s);
                 }
