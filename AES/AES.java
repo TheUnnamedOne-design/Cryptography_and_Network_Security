@@ -332,6 +332,24 @@ public class AES
         return  ans;
     }
 
+    static String[] WordXORHex(String[] a,String[] b)
+    {
+        String answer[]=new String[4];
+        for(int i=0;i<4;i++)
+        {
+            int va=Integer.parseInt(a[i],16);
+            int vb=Integer.parseInt(b[i],16);
+    
+            int v=va^vb;
+    
+            String ans=String.format("%2s", Integer.toHexString(v)).replaceAll(" ","0");
+            answer[i]=ans;
+        }
+        return answer;
+
+    }
+
+
 
     static String[][][] KeyExpansion(String s)
     {
@@ -355,10 +373,21 @@ public class AES
         }
 
 
-        for(int i=1;i<=10;i++)
+
+
+        for(int i=1;i<10;i++)
         {
-            int st=4*i;
-            
+            int nowSt=4*(i-1);
+            int nowEnd=(4*i)-1;
+
+            int nextSt=4*i;
+            int nextEnd=nextSt+3;
+
+            String w4a[]=f_function(words[nowEnd], i);
+            words[nextSt]=WordXORHex(words[nowSt], w4a);
+            words[nextSt+1]=WordXORHex(words[nextSt], words[nowSt+1]);
+            words[nextSt+2]=WordXORHex(words[nowSt+1], words[nowSt+2]);
+            words[nextSt+3]=WordXORHex(words[nowSt+2], words[nowSt+3]);
         }
 
         // for(int i=0;i<4;i++)
