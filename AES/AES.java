@@ -290,6 +290,58 @@ public class AES
     }
 
 
+    static int[] HexToBinaryMultiplicationLarge(String a,String b)
+    {
+        int ans[]=new int[16];
+        int m1[]=new int[9];
+        int m2[]=new int[9];
+
+        int v1=Integer.parseInt(a,16);
+        int v2=Integer.parseInt(b,16);
+
+        String bin1=String.format("%8s", Integer.toBinaryString(v1)).replaceAll(" ", "0");
+        String bin2=String.format("%8s", Integer.toBinaryString(v2)).replaceAll(" ", "0");
+
+        for(int i=0;i<8;i++)
+        {
+            m1[i+1]=Integer.parseInt(String.valueOf(bin1.charAt(i)));
+            m2[i+1]=Integer.parseInt(String.valueOf(bin2.charAt(i)));
+        }
+
+        for(int i=8;i>0;i--)
+        {
+            int pos1=8-i;
+            if(m1[i]==1)
+            {
+                for(int j=8;j>0;j--)
+                {
+                    int pos2=8-j;
+                    if(m2[j]==1)
+                    {
+                        ans[15-(pos1+pos2)]+=1;
+                    }
+                }
+            }
+        }
+
+        for(int i=0;i<16;i++)
+        {
+            if(ans[i]%2==0) ans[i]=0;
+            else ans[i]=1;
+        }
+
+        return ans;
+    }
+
+    static int[] ArrayAddLarge(int a[],int b[])
+    {
+        for(int i=0;i<16;i++)
+        {
+            a[i]=a[i]+b[i];
+        }
+        return a;
+    }
+
     static String[][] InvMixColumns(String matrix[][])
     {
 
@@ -300,10 +352,10 @@ public class AES
             {"0B", "0D", "09", "0E"}
         };
 
-        int ans[]=new int[9];
+        int ans[]=new int[16];
 
         String AnswerMatrix[][]=new String[4][4];
-        int irreducible[]={1,0,0,0,1,1,0,1,1};
+        int irreducible[]={1,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0};
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
@@ -311,11 +363,11 @@ public class AES
                 Arrays.fill(ans, 0);
                 for(int k=0;k<4;k++)
                 {
-                    int hold[]=HexToBinaryMultiplication(fixed[i][k], matrix[k][j]);
-                    ans=ArrayAdd(ans,hold);
+                    int hold[]=HexToBinaryMultiplicationLarge(fixed[i][k], matrix[k][j]);
+                    ans=ArrayAddLarge(ans,hold);
                 }
 
-                for(int x=0;x<9;x++)
+                for(int x=0;x<16;x++)
                 {
                     if(ans[x]%2==0) ans[x]=0;
                     else ans[x]=1;
@@ -324,14 +376,78 @@ public class AES
                 
                 while(ans[0]==1)
                 {
-                    for(int x=0;x<9;x++)
+                    for(int x=0;x<16;x++)
                     {
                         ans[x]=ans[x]^irreducible[x];
                     }
                 }
+                
+
+                while(ans[1]==1 && ans[0]==0)
+                {
+
+                    for(int x=1;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-1];
+                    }
+                }
+                
+                while(ans[2]==1 && ans[0]==0 && ans[1]==0)
+                {
+
+                    for(int x=2;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-2];
+                    }
+                }
+                
+                while(ans[3]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0)
+                {
+                    
+                    for(int x=3;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-3];
+                    }
+                }
+                
+                while(ans[4]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0)
+                {
+                    
+                    for(int x=4;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-4];
+                    }
+                }
+                
+                while(ans[5]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0)
+                {
+                    
+                    for(int x=5;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-5];
+                    }
+                }
+                
+                while(ans[6]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0 && ans[5]==0)
+                {
+                    
+                    for(int x=6;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-6];
+                    }
+                }
+                
+                while(ans[7]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0 && ans[5]==0 && ans[6]==0)
+                {
+                    
+                    for(int x=7;x<16;x++)
+                    {
+                        ans[x]=ans[x]^irreducible[x-7];
+                    }
+                }
 
                 String hold="";
-                for(int x=1;x<9;x++)
+                for(int x=8;x<16;x++)
                 {
                     hold += ans[x];
                 }
@@ -576,12 +692,12 @@ public class AES
         String decrypt(String message)
     {
             String messages[]=message.split("\\s+");
-            String plaintextInput=messages[0];
+            String ciphertextInput=messages[0];
             String keyInput=messages[1];
             String decryptedtext="";
             
             
-            String plaintext = plaintextInput;
+            String ciphertext = ciphertextInput;
             String keyHex = keyInput;
 
             String AllRoundKeys[][][]=KeyExpansion(keyHex);
@@ -589,30 +705,36 @@ public class AES
 
             String key0[][]=StateArray(keyHex);
 
-            matrix = StateArray(plaintext);
+            matrix = StateArray(ciphertext);
+            
+            
             matrix = AddRoundKey(matrix, AllRoundKeys[9]);
-
-
-                for (int round = 8; round >= 0; round--)
-                {
-                    matrix = InvShiftRows(matrix);
-                    matrix = InvSubstituteBytes(matrix);
-                    matrix = AddRoundKey(matrix, AllRoundKeys[round]);
-                    matrix = InvMixColumns(matrix);
-                }
-
             matrix = InvShiftRows(matrix);
             matrix = InvSubstituteBytes(matrix);
 
+            
+            for (int round = 8; round >= 0; round--)
+            {
+                matrix = AddRoundKey(matrix, AllRoundKeys[round]);
+                matrix = InvMixColumns(matrix);
+                matrix = InvShiftRows(matrix);
+                matrix = InvSubstituteBytes(matrix);
+            }
 
-
+            
             matrix = AddRoundKey(matrix, key0);
 
             for (int col = 0; col < 4; col++)
                 for (int row = 0; row < 4; row++)
                     decryptedtext += matrix[row][col];
 
-        return decryptedtext;
+            String plaintext = "";
+            for (int i = 0; i < decryptedtext.length(); i += 2) {
+                String hex = decryptedtext.substring(i, i + 2);
+                plaintext += (char) Integer.parseInt(hex, 16);
+            }
+
+        return plaintext;
         }
             
             
