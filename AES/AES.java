@@ -302,10 +302,12 @@ public class AES
             int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
             int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
 
-            word[i]=SBOXFunction(lv, rv);
+            ans[i]=SBOXFunction(lv, rv);
+            int hold=Integer.parseInt(ans[i],16);
+            String str=String.format("%8s",Integer.toBinaryString(hold)).replaceAll(" ", "0");
+            ans[i]=str;
         }
 
-        
         int index=round-1;
 
         int v2=1<<index;
@@ -314,11 +316,20 @@ public class AES
         String intermediate="";
         for(int i=0;i<8;i++)
         {
-            if(binV.charAt(i)!=word[0].charAt(i)) intermediate+="1";
+            if(binV.charAt(i)!=ans[0].charAt(i)) intermediate+="1";
             else intermediate+="0";
         }
-        word[0]=intermediate;
-        return  word;
+        int value=Integer.parseInt(intermediate,2);
+        String hex=Integer.toHexString(value);
+        ans[0]=hex;
+
+        for(int i=1;i<4;i++)
+        {
+            value=Integer.parseInt(ans[i],2);
+            hex=Integer.toHexString(value);
+            ans[i]=hex;
+        }
+        return  ans;
     }
 
 
@@ -341,6 +352,13 @@ public class AES
                 words[i][j]=hold;
                 ctr+=2;
             }
+        }
+
+
+        for(int i=1;i<=10;i++)
+        {
+            int st=4*i;
+            
         }
 
         // for(int i=0;i<4;i++)
