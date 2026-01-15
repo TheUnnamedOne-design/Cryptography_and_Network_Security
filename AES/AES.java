@@ -375,19 +375,31 @@ public class AES
 
 
 
-        for(int i=1;i<10;i++)
+        for(int i=1;i<=10;i++)
         {
             int nowSt=4*(i-1);
             int nowEnd=(4*i)-1;
 
             int nextSt=4*i;
-            int nextEnd=nextSt+3;
 
             String w4a[]=f_function(words[nowEnd], i);
             words[nextSt]=WordXORHex(words[nowSt], w4a);
             words[nextSt+1]=WordXORHex(words[nextSt], words[nowSt+1]);
-            words[nextSt+2]=WordXORHex(words[nowSt+1], words[nowSt+2]);
-            words[nextSt+3]=WordXORHex(words[nowSt+2], words[nowSt+3]);
+            words[nextSt+2]=WordXORHex(words[nextSt+1], words[nowSt+2]);
+            words[nextSt+3]=WordXORHex(words[nextSt+2], words[nowSt+3]);
+        }
+
+        int rk=0;
+        for(int i=4;i<44;i+=4)
+        {
+            for(int j=0;j<4;j++)
+            {
+                for(int k=0;k<4;k++)
+                {
+                    AllKeys[rk][k][j] = words[i+j][k];
+                }
+            }
+            rk++;
         }
 
         // for(int i=0;i<4;i++)
@@ -415,6 +427,24 @@ public class AES
             String keyHex = textToHex(keyInput);
 
             String AllRoundKeys[][][]=KeyExpansion(keyHex);
+
+            
+
+            for (int round = 0; round < AllRoundKeys.length; round++)
+            {
+                System.out.println("Round Key " + (round + 1) + ":");
+
+                for (int row = 0; row < 4; row++)
+                {
+                    for (int col = 0; col < 4; col++)
+                    {
+                        System.out.print(AllRoundKeys[round][row][col] + " ");
+                    }
+                    System.out.println();
+                }
+
+                System.out.println();
+            }
         
             //System.out.println("plaintext : "+plaintext+"| KeyHex : "+keyHex);
 
