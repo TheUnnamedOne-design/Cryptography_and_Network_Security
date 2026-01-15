@@ -100,9 +100,8 @@ public class AES
     }
 
 
-    static String[][] SubstituteBytes(String matrix[][])
+    static String SBOXFunction(int i,int j)
     {
-
         String[][] SBOX = {
         {"63","7C","77","7B","F2","6B","6F","C5","30","01","67","2B","FE","D7","AB","76"},
         {"CA","82","C9","7D","FA","59","47","F0","AD","D4","A2","AF","9C","A4","72","C0"},
@@ -121,6 +120,14 @@ public class AES
         {"E1","F8","98","11","69","D9","8E","94","9B","1E","87","E9","CE","55","28","DF"},
         {"8C","A1","89","0D","BF","E6","42","68","41","99","2D","0F","B0","54","BB","16"}
         };
+        return SBOX[i][j];
+    }
+
+
+    static String[][] SubstituteBytes(String matrix[][])
+    {
+
+        
 
         for(int i=0;i<4;i++)
         {
@@ -130,7 +137,7 @@ public class AES
                 int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
                 int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
 
-                matrix[i][j]=SBOX[lv][rv];
+                matrix[i][j]=SBOXFunction(lv, rv);
             }
         }
         return matrix;
@@ -280,12 +287,50 @@ public class AES
     }
 
 
+    static String[] f_function(String word[],int round)
+    {
+        String ans[]=new String[4];
+
+        ans[0]=word[1];
+        ans[1]=word[2];
+        ans[2]=word[3];
+        ans[3]=word[0];
+
+        for(int i=0;i<4;i++)
+        {
+            String holder=ans[i];
+            int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
+            int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
+
+            word[i]=SBOXFunction(lv, rv);
+        }
+
+        
+        int index=round-1;
+
+        int v2=1<<index;
+        String binV=String.format("%8s",Integer.toBinaryString(v2)).replaceAll(" ", "0");
+
+        String intermediate="";
+        for(int i=0;i<8;i++)
+        {
+            if(binV.charAt(i)!=word[0].charAt(i)) intermediate+="1";
+            else intermediate+="0";
+        }
+        word[0]=intermediate;
+        return  word;
+    }
+
+
     static String[] KeyExpansion(String s)
     {
 
         String AllKeys[]=new String[10];
         String km[][]=new String[4][4];
+        String words[][]=new String[4][4];
         int ctr=0;
+
+
 
         for(int i=0;i<4;i++)
         {
@@ -293,6 +338,7 @@ public class AES
             {
                 String hold=s.substring(ctr,ctr+2);
                 km[j][i]=hold;
+                words[i][j]=hold;
                 ctr+=2;
             }
         }
