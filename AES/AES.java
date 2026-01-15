@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class AES
 {
     
@@ -162,6 +164,120 @@ public class AES
         }
         return matrix;
     }
+
+    static int[] HexToBinaryMultiplication(String a,String b)
+    {
+        int ans[]=new int[9];
+        int m1[]=new int[9];
+        int m2[]=new int[9];
+
+        int v1=Integer.parseInt(a,16);
+        int v2=Integer.parseInt(b,16);
+
+        String bin1=String.format("%8s", Integer.toBinaryString(v1)).replaceAll(" ", "0");
+        String bin2=String.format("%8s", Integer.toBinaryString(v2)).replaceAll(" ", "0");
+
+
+
+        
+
+        for(int i=0;i<8;i++)
+        {
+            m1[i+1]=Integer.parseInt(String.valueOf(bin1.charAt(i)));
+            m2[i+1]=Integer.parseInt(String.valueOf(bin2.charAt(i)));
+        }
+
+
+
+        for(int i=8;i>0;i--)
+        {
+            int pos1=8-i;
+            if(m1[i]==1)
+            {
+                for(int j=8;j>0;j--)
+                    {
+                    int pos2=8-j;
+                    if(m2[j]==1)
+                    {
+                        //System.out.println("Match : "+pos1+" "+pos2);
+                        ans[8-(pos1+pos2)]+=1;
+                    }
+                }
+            }
+        }
+
+        for(int i=0;i<9;i++)
+        {
+            if(ans[i]%2==0) ans[i]=0;
+            else ans[i]=1;
+        }
+
+        return ans;
+    }
+
+
+    static int[] ArrayAdd(int a[],int b[])
+    {
+        for(int i=0;i<9;i++)
+        {
+            a[i]=a[i]+b[i];
+        }
+        return a;
+    }
+
+
+    static String[][] MixColumns(String matrix[][])
+    {
+
+        String[][] fixed = {
+                            {"02", "03", "01", "01"},
+                            {"01", "02", "03", "01"},
+                            {"01", "01", "02", "03"},
+                            {"03", "01", "01", "02"}
+                        };
+
+        int ans[]=new int[9];
+
+        String AnswerMatrix[][]=new String[4][4];
+
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                Arrays.fill(ans, 0);
+                for(int k=0;k<4;k++)
+                {
+                    int hold[]=HexToBinaryMultiplication(fixed[i][k], matrix[k][j]);
+                    ans=ArrayAdd(ans,hold);
+                }
+
+                for(int x=0;x<9;x++)
+                {
+                    if(ans[x]%2==0) ans[x]=0;
+                    else ans[x]=1;
+                }
+                
+                int irreducible[]={1,0,0,0,1,1,0,1,1};
+                for(int x=0;x<9;x++)
+                {
+                    ans[x]=ans[x]^irreducible[x];
+                }
+
+                String hold="";
+                for(int x=1;x<9;x++)
+                {
+                    hold+=Integer.toBinaryString(ans[x]);
+                }
+                int value=Integer.parseInt(hold,2);
+                String finalHex=Integer.toHexString(value);
+
+                AnswerMatrix[i][j]=finalHex;
+            }
+        }
+
+
+        return AnswerMatrix;
+    }
     
     String encrypt(String message)
     {
@@ -184,15 +300,17 @@ public class AES
             
             
              matrix=ShiftRows(matrix);
-            for(int i=0;i<4;i++)
-            {
-                for(int j=0;j<4;j++)
-                {
-                    System.out.print(matrix[i][j]+" ");
-                }
-                System.out.println();
-            }
-                
+             
+             matrix=MixColumns(matrix);
+             for(int i=0;i<4;i++)
+             {
+                 for(int j=0;j<4;j++)
+                 {
+                     System.out.print(matrix[i][j]+" ");
+                 }
+                 System.out.println();
+             }
+
             return encryptedtext;
         }
             
