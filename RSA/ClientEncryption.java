@@ -18,27 +18,26 @@ public class ClientEncryption
             DataInputStream in=new DataInputStream(socket.getInputStream());
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
+           
+            String pub = in.readUTF();
+            String[] P = pub.split("\\s+");
+
+            int n = Integer.parseInt(P[0]);
+            int e = Integer.parseInt(P[1]);
+
+            RSA rsa = new RSA(n, e);
+
             
-            try
-            {
-                while (true) { 
-                    System.out.print("Enter n: ");
-                    int n=Integer.parseInt(br.readLine());
-                    System.out.print("Enter message: ");
-                    int message=Integer.parseInt(br.readLine());
-                    System.out.print("Enter e : ");
-                    int e=Integer.parseInt(br.readLine());
-                    RSA rsa=new RSA(n,e);
-                    s=Integer.valueOf(rsa.encrypt(message)).toString();
-                    out.writeUTF(s);
-                    System.out.println("Client Sent Message : "+s);
-                    s=in.readUTF();
-                    System.out.println("Server Decrypted Reply : "+s);
-                }
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
+            while (true) {
+                System.out.print("Enter message: ");
+                int message = Integer.parseInt(br.readLine());
+
+                int cipher = rsa.encrypt(message);
+                out.writeUTF(Integer.toString(cipher));
+                System.out.println("Sent : " + cipher);
+
+                String reply = in.readUTF();
+                System.out.println("Server decrypted: " + reply);
             }
 
 
