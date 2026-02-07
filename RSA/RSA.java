@@ -1,6 +1,6 @@
 public class RSA
 {
-    static int e,d,n;
+     int e,d,n;
 
     //Client Constructor
     public RSA(int n,int e)

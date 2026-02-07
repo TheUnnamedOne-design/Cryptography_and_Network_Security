@@ -19,37 +19,27 @@ public class ClientEncryption
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
             
-            try
-            {
-                while (true) { 
-                    System.out.print("Enter q: ");
-                    int q=Integer.parseInt(br.readLine());
+            String pub = in.readUTF();
+            String[] P = pub.split("\\s+");
 
-                    System.out.print("Enter message: ");
-                    int message=Integer.parseInt(br.readLine());
+            int q = Integer.parseInt(P[0]);
+            int alpha = Integer.parseInt(P[1]);
+            int Y_A = Integer.parseInt(P[2]);
 
-                    System.out.print("Enter alpha : ");
-                    int alpha=Integer.parseInt(br.readLine());
+            Elgamal elgamal = new Elgamal(q, alpha, Y_A);
 
-                    System.out.print("Enter Y_A : ");
-                    int Y_A=Integer.parseInt(br.readLine());
+            
+            while (true) {
+                System.out.print("Enter message: ");
+                int message = Integer.parseInt(br.readLine());
 
+                int[] cipher = elgamal.encrypt(message);
+                s=Integer.valueOf(cipher[0]).toString()+" "+Integer.valueOf(cipher[1]).toString();
+                System.out.println("Sent : "+s);
+                out.writeUTF(s);
 
-                   Elgamal elgamal=new Elgamal(q,alpha,Y_A);
-                    int arr[]=(elgamal.encrypt(message));
-
-                    s=Integer.valueOf(arr[0]).toString()+" "+Integer.valueOf(arr[1]).toString();
-
-
-                    out.writeUTF(s);
-                    System.out.println("Client Sent Message : "+s);
-                    s=in.readUTF();
-                    System.out.println("Server Decrypted Reply : "+s);
-                }
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
+                String reply = in.readUTF();
+                System.out.println("Server decrypted: " + reply);
             }
 
 

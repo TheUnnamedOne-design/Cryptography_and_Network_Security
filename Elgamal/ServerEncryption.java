@@ -17,38 +17,36 @@ public class ServerEncryption
             DataOutputStream out=new DataOutputStream(socket.getOutputStream());
             String s="";
             
-            try
-            {
-                while (true) {
-                    
-                    String message=(in.readUTF());
-                    System.out.println("Received cipher message : "+message);
+            System.out.print("Enter q: ");
+            int q = Integer.parseInt(br.readLine());
 
-                    String C[]=message.split("\\s+");
+            System.out.print("Enter alpha: ");
+            int alpha = Integer.parseInt(br.readLine());
 
-                    int c1=Integer.parseInt(C[0]);
-                    int c2=Integer.parseInt(C[1]);
+            System.out.print("Enter X_A: ");
+            int X_A = Integer.parseInt(br.readLine());
 
+            
+            Elgamal temp = new Elgamal(q, alpha, X_A, true);
+            int Y_A = temp.fast_exp(q, alpha, X_A);
 
-                    System.out.print("Enter q: ");
-                    int q=Integer.parseInt(br.readLine());
-                    
-                    System.out.print("Enter X_A : ");
-                    int X_A=Integer.parseInt(br.readLine());
+            
+            out.writeUTF(q + " " + alpha + " " + Y_A);
 
-                    System.out.print("Enter alpha : ");
-                    int alpha=Integer.parseInt(br.readLine());
+            Elgamal elgamal = new Elgamal(q, alpha, X_A, true);
 
+            
+            while (true) {
+                String message = in.readUTF();
+                System.out.println("Client sent : "+message);
+                String[] C = message.split("\\s+");
 
-                    Elgamal elgamal=new Elgamal(q,alpha,X_A,true);
-                    s=Integer.valueOf(elgamal.decrypt(c1,c2)).toString();
-                    out.writeUTF(s);
-                    System.out.println("Server Decrypted : "+s);
-                }
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
+                int c1 = Integer.parseInt(C[0]);
+                int c2 = Integer.parseInt(C[1]);
+
+                int M = elgamal.decrypt(c1, c2);
+                System.out.println("Decryped Message : "+M);
+                out.writeUTF(Integer.toString(M));
             }
 
 

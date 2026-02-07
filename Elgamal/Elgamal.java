@@ -3,7 +3,7 @@ import java.util.Random;
 public class Elgamal
 {
     
-    static int q,alpha,Y_A,X_A;
+     int q,alpha,Y_A,X_A;
 
     //Client Constructor
     public Elgamal(int q,int a,int Y_a)
@@ -71,6 +71,8 @@ public class Elgamal
 
         int c1=fast_exp(q, alpha, k);
         int c2=(K*M)%q;
+
+        
 
         arr[0]=c1;
         arr[1]=c2;
