@@ -91,7 +91,6 @@ public class MD5 {
                        ((padded[index + 3] & 0xff) << 24);
             }
 
-            // Round 1
             for (int i = 0; i < 16; i++) {
                 int temp = B + Integer.rotateLeft(A + F(B, C, D) + X[i] + T[i], shift[i]);
                 A = D;
@@ -100,7 +99,6 @@ public class MD5 {
                 B = temp;
             }
 
-            // Round 2
             for (int i = 16; i < 32; i++) {
                 int temp = B + Integer.rotateLeft(A + G(B, C, D) + X[(5 * i + 1) % 16] + T[i], shift[i]);
                 A = D;
@@ -109,7 +107,6 @@ public class MD5 {
                 B = temp;
             }
 
-            // Round 3
             for (int i = 32; i < 48; i++) {
                 int temp = B + Integer.rotateLeft(A + H(B, C, D) + X[(3 * i + 5) % 16] + T[i], shift[i]);
                 A = D;
@@ -118,7 +115,6 @@ public class MD5 {
                 B = temp;
             }
 
-            // Round 4
             for (int i = 48; i < 64; i++) {
                 int temp = B + Integer.rotateLeft(A + I(B, C, D) + X[(7 * i) % 16] + T[i], shift[i]);
                 A = D;

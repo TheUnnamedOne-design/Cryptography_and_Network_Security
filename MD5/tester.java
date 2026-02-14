@@ -5,9 +5,6 @@ public class tester
 
         String message="abc";
 
-        //obj.print(obj.T);
-
-        
         System.out.println(obj.hash(message));
 
     }
