@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.jdt.ls.lombokSupport.enabled": false,
+    "java.sources.organizeImports.staticStarThreshold": 99,
+    "java.sources.organizeImports.starThreshold": 99
+}
