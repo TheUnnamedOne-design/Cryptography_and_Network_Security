@@ -144,6 +144,7 @@ public class ServerRailFence
             Socket socket = server.accept();
             System.out.println("Device connected");
             communicate(socket);
+            server.close();
         }
         catch (Exception e)
         {
