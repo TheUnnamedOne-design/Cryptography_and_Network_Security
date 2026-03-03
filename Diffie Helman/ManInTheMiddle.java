@@ -40,11 +40,37 @@ public class ManInTheMiddle
             DiffieHellman dhForClient = new DiffieHellman(p, g);
             
             // Get MITM's private keys
-            System.out.print("\nEnter MITM's private key for Server connection: ");
-            int mitmPrivateKeyServer = Integer.parseInt(br.readLine());
+            int mitmPrivateKeyServer = 0;
+            while (true) {
+                try {
+                    System.out.print("\nEnter MITM's private key for Server connection: ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        mitmPrivateKeyServer = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
-            System.out.print("Enter MITM's private key for Client connection: ");
-            int mitmPrivateKeyClient = Integer.parseInt(br.readLine());
+            int mitmPrivateKeyClient = 0;
+            while (true) {
+                try {
+                    System.out.print("Enter MITM's private key for Client connection: ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        mitmPrivateKeyClient = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
             // Generate MITM's public keys
             int mitmPublicKeyForServer = dhForServer.generatePublicKey(mitmPrivateKeyServer);

@@ -27,8 +27,21 @@ public class ClientEncryption
             DiffieHellman dh = new DiffieHellman(p, g);
             
             // Get client's private key
-            System.out.print("Enter your private key: ");
-            int clientPrivateKey = Integer.parseInt(br.readLine());
+            int clientPrivateKey = 0;
+            while (true) {
+                try {
+                    System.out.print("Enter your private key: ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        clientPrivateKey = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
             // Generate client's public key
             int clientPublicKey = dh.generatePublicKey(clientPrivateKey);
@@ -59,8 +72,9 @@ public class ClientEncryption
     {
         try
         {
-            Socket socket = new Socket("localhost", 8000);
-            System.out.println("Connected to Server");
+            // Connect to port 8001 for MITM simulation (8000 for direct server connection)
+            Socket socket = new Socket("localhost", 8001);
+            System.out.println("Connected to Server (via MITM proxy on port 8001)");
             operate(socket);
         }
         catch(Exception e)

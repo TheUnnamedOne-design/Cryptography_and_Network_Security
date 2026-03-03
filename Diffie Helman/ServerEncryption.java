@@ -16,11 +16,37 @@ public class ServerEncryption
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             
             // Get prime number p and generator g
-            System.out.print("Enter prime number (p): ");
-            int p = Integer.parseInt(br.readLine());
+            int p = 0;
+            while (true) {
+                try {
+                    System.out.print("Enter prime number (p): ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        p = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
-            System.out.print("Enter generator (g): ");
-            int g = Integer.parseInt(br.readLine());
+            int g = 0;
+            while (true) {
+                try {
+                    System.out.print("Enter generator (g): ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        g = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
             // Send p and g to client
             out.writeUTF(p + " " + g);
@@ -30,8 +56,21 @@ public class ServerEncryption
             DiffieHellman dh = new DiffieHellman(p, g);
             
             // Get server's private key
-            System.out.print("Enter your private key: ");
-            int serverPrivateKey = Integer.parseInt(br.readLine());
+            int serverPrivateKey = 0;
+            while (true) {
+                try {
+                    System.out.print("Enter your private key: ");
+                    String input = br.readLine();
+                    if (input != null && !input.trim().isEmpty()) {
+                        serverPrivateKey = Integer.parseInt(input.trim());
+                        break;
+                    } else {
+                        System.out.println("Invalid input. Please enter a number.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input. Please enter a valid integer.");
+                }
+            }
             
             // Generate server's public key
             int serverPublicKey = dh.generatePublicKey(serverPrivateKey);
