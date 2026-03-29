@@ -26,8 +26,10 @@ public class Server
                 System.out.println("Client Received : "+s);
                 System.out.print("Enter key : ");
                 String key=br.readLine();
-                //key=des.textToBinary(key);
-                s=s+" "+key;
+                String[] parts = s.split("\\s+");
+                String modifiedCiphertext = "Modified" + parts[0];
+                s = modifiedCiphertext + " " + parts[1] + " " + parts[2] + " " + parts[3] + " " + key;
+                
                 s=elgamal.verify(s);
                 out.writeUTF(s);
                 System.out.println("Server Message : "+s);

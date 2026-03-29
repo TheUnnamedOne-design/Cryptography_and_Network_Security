@@ -24,11 +24,10 @@ public class ClientEncryption
             {
                 while (true) { 
                 System.out.print("Enter plain text: ");
-                String s1=br.readLine();
+                String plaintext=br.readLine();
                 System.out.print("Enter key : ");
-                String s2=br.readLine();
-                s=s1+" "+s2;
-                s=aes.encrypt(s);
+                String key=br.readLine();
+                s=aes.encrypt(plaintext, key);
                 out.writeUTF(s);
                 System.out.println("Client : "+s);
                 s=in.readUTF();

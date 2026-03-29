@@ -1,63 +1,6 @@
-import java.util.Arrays;
-
+import java.nio.charset.*;
 public class AES
 {
-    
-
-    
-    static String textToHex(String text)
-    {
-        
-        if(text.length() < 16)
-        {
-            
-            text = String.format("%-16s", text);
-        }
-        else if(text.length() > 16)
-        {
-            
-            text = text.substring(0, 16);
-        }
-        
-        String hex = "";
-        for(int i=0; i<text.length(); i++)
-        {
-            String charHex = String.format("%2s", Integer.toHexString(text.charAt(i))).replaceAll(" ", "0");
-            hex += charHex;
-        }
-        return hex;
-    }
-    
-    
-    static String binaryToText(String binary)
-    {
-        String text = "";
-        for(int i=0; i<binary.length(); i+=8)
-        {
-            String byteStr = binary.substring(i, i+8);
-            int charCode = Integer.parseInt(byteStr, 2);
-            text += (char)charCode;
-        }
-        return text;
-    }
-
-    static String BinaryXOR(String a,String b)
-    {
-        String ans="";
-        a=String.format("%8s", a).replaceAll(" ", "0");
-        b=String.format("%8s", b).replaceAll(" ", "0");
-        for(int i=0;i<a.length();i++)
-        {
-            if(a.charAt(i)!=b.charAt(i)) ans+="1";
-            else ans+="0";
-        }
-        return ans;
-    }
-
-
-    
-
-
     static String SBOXFunction(int i,int j)
     {
         String[][] SBOX = {
@@ -106,636 +49,467 @@ public class AES
         return INV_SBOX[i][j];
     }
 
-
-    static String[][] SubstituteBytes(String matrix[][])
+    public byte[] StringToBytes(String a)
     {
-
-        
-
-        for(int i=0;i<4;i++)
-        {
-            for(int j=0;j<4;j++)
-            {
-                String holder=matrix[i][j];
-                int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
-                int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
-
-                matrix[i][j]=SBOXFunction(lv, rv);
-            }
-        }
-        return matrix;
+        return a.getBytes(StandardCharsets.UTF_8);
     }
 
-    static String[][] InvSubstituteBytes(String matrix[][])
+    public String BytesToHex(byte[] arr)
     {
-
-        
-
-        for(int i=0;i<4;i++)
+        String ans="";
+        for(int i=0;i<arr.length;i++)
         {
-            for(int j=0;j<4;j++)
-            {
-                String holder=matrix[i][j];
-                int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
-                int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
-
-                matrix[i][j]=InvSBOXFunction(lv, rv);
-            }
+            String hold=String.format("%02X", arr[i]);
+            ans+=hold;
         }
-        return matrix;
-    }
-    
-
-    static String[][] ShiftRows(String[][] state)
-    {
-        for (int r=1; r<4; r++)
-        {
-            String[] temp = new String[4];
-            for (int c=0; c<4; c++)
-            {
-                temp[c]=state[r][(c+r) % 4];
-            }
-            state[r] = temp;
-        }
-        return state;
-    }
-
-    static String[][] InvShiftRows(String[][] state)
-    {
-        for (int r=1; r<4; r++)
-        {
-            String[] temp = new String[4];
-            for (int c=0; c<4; c++)
-            {
-                temp[(c+r) % 4] = state[r][c];
-            }
-            state[r] = temp;
-        }
-        return state;
-    }
-
-    static int[] HexToBinaryMultiplication(String a,String b)
-    {
-        int ans[]=new int[9];
-        int m1[]=new int[9];
-        int m2[]=new int[9];
-
-        int v1=Integer.parseInt(a,16);
-        int v2=Integer.parseInt(b,16);
-
-        String bin1=String.format("%8s", Integer.toBinaryString(v1)).replaceAll(" ", "0");
-        String bin2=String.format("%8s", Integer.toBinaryString(v2)).replaceAll(" ", "0");
-
-
-
-        
-
-        for(int i=0;i<8;i++)
-        {
-            m1[i+1]=Integer.parseInt(String.valueOf(bin1.charAt(i)));
-            m2[i+1]=Integer.parseInt(String.valueOf(bin2.charAt(i)));
-        }
-
-
-
-        for(int i=8;i>0;i--)
-        {
-            int pos1=8-i;
-            if(m1[i]==1)
-            {
-                for(int j=8;j>0;j--)
-                    {
-                    int pos2=8-j;
-                    if(m2[j]==1)
-                    {
-                        //System.out.println("Match : "+pos1+" "+pos2);
-                        ans[8-(pos1+pos2)]+=1;
-                    }
-                }
-            }
-        }
-
-        for(int i=0;i<9;i++)
-        {
-            if(ans[i]%2==0) ans[i]=0;
-            else ans[i]=1;
-        }
-
         return ans;
     }
 
 
-    static int[] ArrayAdd(int a[],int b[])
+    public byte[] HexToBytes(String a)
     {
-        for(int i=0;i<9;i++)
+        int n=a.length();
+        byte arr[]=new byte[n/2];
+        for(int i=0;i<a.length();i+=2)
         {
-            a[i]=a[i]+b[i];
+            arr[i/2]=(byte)Integer.parseInt(a.substring(i,i+2),16);
         }
-        return a;
+        return arr;
+    }
+
+    public String ByteToString(byte[] arr)
+    {
+        return new String(arr,StandardCharsets.UTF_8);
     }
 
 
-    static String[][] MixColumns(String matrix[][])
+    public byte[] EnsureLength(byte[] arr, int n)
     {
+        if(arr.length<n)
+        {
+            byte bytes[]=new byte[n];
+            System.arraycopy(arr, 0, bytes, 0, arr.length);
+            return bytes;
+        }
+        else if(arr.length>n)
+        {
+            byte bytes[]=new byte[n];
+            System.arraycopy(arr, 0, bytes, 0, n);
+            return bytes;
+        }
+        return arr;
+    }
 
-        String[][] fixed = {
-                            {"02", "03", "01", "01"},
-                            {"01", "02", "03", "01"},
-                            {"01", "01", "02", "03"},
-                            {"03", "01", "01", "02"}
-                        };
-
-        int ans[]=new int[9];
-
-        String AnswerMatrix[][]=new String[4][4];
-        int irreducible[]={1,0,0,0,1,1,0,1,1};
+    public String[][] MakeMatrix(String s)
+    {
+        String mat[][]=new String[4][4];
+        int ctr=0;
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
             {
-                Arrays.fill(ans, 0);
-                for(int k=0;k<4;k++)
-                {
-                    int hold[]=HexToBinaryMultiplication(fixed[i][k], matrix[k][j]);
-                    ans=ArrayAdd(ans,hold);
-                }
-
-                for(int x=0;x<9;x++)
-                {
-                    if(ans[x]%2==0) ans[x]=0;
-                    else ans[x]=1;
-                }
-                
-                
-                while(ans[0]==1)
-                {
-                    for(int x=0;x<9;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x];
-                    }
-                }
-
-                String hold="";
-                for(int x=1;x<9;x++)
-                {
-                    hold += ans[x];
-                }
-                int value=Integer.parseInt(hold,2);
-                AnswerMatrix[i][j]=String.format("%02x", value);
+                mat[j][i]=s.substring(ctr,ctr+2);
+                ctr+=2;
             }
         }
-
-
-        return AnswerMatrix;
+        return mat;
     }
 
 
-    static int[] HexToBinaryMultiplicationLarge(String a,String b)
+    String[] f_function(String word[],int round)
     {
-        int ans[]=new int[16];
-        int m1[]=new int[9];
-        int m2[]=new int[9];
-
-        int v1=Integer.parseInt(a,16);
-        int v2=Integer.parseInt(b,16);
-
-        String bin1=String.format("%8s", Integer.toBinaryString(v1)).replaceAll(" ", "0");
-        String bin2=String.format("%8s", Integer.toBinaryString(v2)).replaceAll(" ", "0");
-
-        for(int i=0;i<8;i++)
-        {
-            m1[i+1]=Integer.parseInt(String.valueOf(bin1.charAt(i)));
-            m2[i+1]=Integer.parseInt(String.valueOf(bin2.charAt(i)));
-        }
-
-        for(int i=8;i>0;i--)
-        {
-            int pos1=8-i;
-            if(m1[i]==1)
-            {
-                for(int j=8;j>0;j--)
-                {
-                    int pos2=8-j;
-                    if(m2[j]==1)
-                    {
-                        ans[15-(pos1+pos2)]+=1;
-                    }
-                }
-            }
-        }
-
-        for(int i=0;i<16;i++)
-        {
-            if(ans[i]%2==0) ans[i]=0;
-            else ans[i]=1;
-        }
-
-        return ans;
-    }
-
-    static int[] ArrayAddLarge(int a[],int b[])
-    {
-        for(int i=0;i<16;i++)
-        {
-            a[i]=a[i]+b[i];
-        }
-        return a;
-    }
-
-    static String[][] InvMixColumns(String matrix[][])
-    {
-
-        String[][] fixed = {
-            {"0E", "0B", "0D", "09"},
-            {"09", "0E", "0B", "0D"},
-            {"0D", "09", "0E", "0B"},
-            {"0B", "0D", "09", "0E"}
-        };
-
-        int ans[]=new int[16];
-
-        String AnswerMatrix[][]=new String[4][4];
-        int irreducible[]={1,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0};
+        String temp[]=new String[4];
         for(int i=0;i<4;i++)
         {
-            for(int j=0;j<4;j++)
-            {
-                Arrays.fill(ans, 0);
-                for(int k=0;k<4;k++)
-                {
-                    int hold[]=HexToBinaryMultiplicationLarge(fixed[i][k], matrix[k][j]);
-                    ans=ArrayAddLarge(ans,hold);
-                }
-
-                for(int x=0;x<16;x++)
-                {
-                    if(ans[x]%2==0) ans[x]=0;
-                    else ans[x]=1;
-                }
-                
-                
-                while(ans[0]==1)
-                {
-                    for(int x=0;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x];
-                    }
-                }
-                
-
-                while(ans[1]==1 && ans[0]==0)
-                {
-
-                    for(int x=1;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-1];
-                    }
-                }
-                
-                while(ans[2]==1 && ans[0]==0 && ans[1]==0)
-                {
-
-                    for(int x=2;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-2];
-                    }
-                }
-                
-                while(ans[3]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0)
-                {
-                    
-                    for(int x=3;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-3];
-                    }
-                }
-                
-                while(ans[4]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0)
-                {
-                    
-                    for(int x=4;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-4];
-                    }
-                }
-                
-                while(ans[5]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0)
-                {
-                    
-                    for(int x=5;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-5];
-                    }
-                }
-                
-                while(ans[6]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0 && ans[5]==0)
-                {
-                    
-                    for(int x=6;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-6];
-                    }
-                }
-                
-                while(ans[7]==1 && ans[0]==0 && ans[1]==0 && ans[2]==0 && ans[3]==0 && ans[4]==0 && ans[5]==0 && ans[6]==0)
-                {
-                    
-                    for(int x=7;x<16;x++)
-                    {
-                        ans[x]=ans[x]^irreducible[x-7];
-                    }
-                }
-
-                String hold="";
-                for(int x=8;x<16;x++)
-                {
-                    hold += ans[x];
-                }
-                int value=Integer.parseInt(hold,2);
-                AnswerMatrix[i][j]=String.format("%02x", value);
-            }
+            temp[i]=word[(i+1)%4];
         }
-
-
-        return AnswerMatrix;
-    }
-
-
-    static String[] f_function(String word[],int round)
-    {
-        String ans[]=new String[4];
-
-        ans[0]=word[1];
-        ans[1]=word[2];
-        ans[2]=word[3];
-        ans[3]=word[0];
-
         for(int i=0;i<4;i++)
         {
-            String holder=ans[i];
-            int lv=Integer.parseInt(String.valueOf(holder.charAt(0)),16);
-            int rv=Integer.parseInt(String.valueOf(holder.charAt(1)),16);
-
-            ans[i]=SBOXFunction(lv, rv);
+            int row=Integer.parseInt(String.valueOf(temp[i].charAt(0)),16);
+            int col=Integer.parseInt(String.valueOf(temp[i].charAt(1)),16);
+            temp[i]=SBOXFunction(row,col);
         }
-
-        int[] RCON = {
-                0x01,0x02,0x04,0x08,0x10,
-                0x20,0x40,0x80,0x1B,0x36
-            };
-
-        int val0 = Integer.parseInt(ans[0], 16) ^ RCON[round - 1];
-        ans[0] = String.format("%02x", val0);
-
-        for(int i=1;i<4;i++)
-        {
-            ans[i] = String.format("%02x", Integer.parseInt(ans[i], 16));
-        }
-        return  ans;
-    }
-
-    static String[] WordXORHex(String[] a,String[] b)
-    {
-        String answer[]=new String[4];
+        int Rcon[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36};
+        int v=Integer.parseInt(temp[0],16);
+        v^=Rcon[round-1];
+        temp[0]=String.format("%02X",v);
         for(int i=0;i<4;i++)
         {
-            int va=Integer.parseInt(a[i],16);
-            int vb=Integer.parseInt(b[i],16);
-    
-            int v=va^vb;
-    
-            String ans=String.format("%2s", Integer.toHexString(v)).replaceAll(" ","0");
-            answer[i]=ans;
+            v=Integer.parseInt(temp[i],16);
+            temp[i]=String.format("%02x", v);
         }
-        return answer;
 
+        return temp;
     }
 
 
-
-    static String[][][] KeyExpansion(String s)
+    public String[] XORWord(String a[],String b[])
     {
+        String temp[]=new String[4];
+        //System.out.println("hello");
+        for(int i=0;i<4;i++)
+        {
+            int av=Integer.parseInt(a[i],16);
+            int bv=Integer.parseInt(b[i],16);
 
-        String AllKeys[][][]=new String[10][4][4];
-        String km[][]=new String[4][4];
+            int v=av^bv;
+            temp[i]=String.format("%02X",v);
+            //System.out.println("Hello : "+temp[i]);
+        }
+
+        return temp;
+    }
+
+
+    public String[][][] KeyExpansion(String keyHex)
+    {
+        String ans[][][]=new String[11][4][4];
         String words[][]=new String[44][4];
         int ctr=0;
-
-
-
         for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
             {
-                String hold=s.substring(ctr,ctr+2);
-                km[j][i]=hold;
-                words[i][j]=hold;
+                words[i][j]=keyHex.substring(ctr,ctr+2);
                 ctr+=2;
             }
         }
 
-
-
-
-        for(int i=1;i<=10;i++)
-        {
-            int nowSt=4*(i-1);
-            int nowEnd=(4*i)-1;
-
-            int nextSt=4*i;
-
-            String w4a[]=f_function(words[nowEnd], i);
-            words[nextSt]=WordXORHex(words[nowSt], w4a);
-            words[nextSt+1]=WordXORHex(words[nextSt], words[nowSt+1]);
-            words[nextSt+2]=WordXORHex(words[nextSt+1], words[nowSt+2]);
-            words[nextSt+3]=WordXORHex(words[nextSt+2], words[nowSt+3]);
+        ans[0]=MakeMatrix(keyHex);
+        //System.out.println("HELLO");
+        for(int round=1;round<=10;round++)
+            {
+                int current=4*(round-1);
+                int currentEnd=4*round-1;
+                int next=4*(round);
+                
+                //System.out.println("HELLO");
+                String w4a[]=f_function(words[currentEnd],round);
+                //String w4a[]={"12","45","78","42"};
+                words[next]=XORWord(w4a, words[current]);
+                words[next+1]=XORWord(words[current+1], words[next]);
+                words[next+2]=XORWord(words[current+2], words[next+1]);
+                words[next+3]=XORWord(words[current+3], words[next+2]);
+                //System.out.println("HELLO");
         }
 
-        int rk=0;
-        for(int i=4;i<44;i+=4)
+        for(int i=0;i<11;i++) {
+            for(int j=0;j<4;j++) {
+                for(int k=0;k<4;k++) {
+                    ans[i][k][j] = words[4*i + j][k];
+                }
+            }
+        }
+        return ans;
+    }
+
+
+    void printMatrix(String mat[][])
+    {
+        int m=mat.length;
+        int n=mat[0].length;
+
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<n;j++)
+            {
+                System.out.print(mat[i][j]+" ");
+            }
+            System.out.println();
+        }
+        
+    }
+
+
+    public String[][] StateXOR(String a[][], String b[][])
+    {
+        String ans[][]=new String[4][4];
+
+        for(int i=0;i<4;i++)
         {
             for(int j=0;j<4;j++)
             {
+                int av=Integer.parseInt(a[i][j],16);
+                int bv=Integer.parseInt(b[i][j],16);
+                int v=av^bv;
+                ans[i][j]=String.format("%02X", v);
+            }
+        }
+        return ans;
+    }
+
+    public String[][] SubBytes(String state[][])
+    {
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                int row=Integer.parseInt(String.valueOf(state[i][j].charAt(0)),16);
+                int col=Integer.parseInt(String.valueOf(state[i][j].charAt(1)),16);
+
+                state[i][j]=SBOXFunction(row, col);
+            }
+        }
+
+        return state;
+    }
+
+
+    public String[][] ShiftRows(String state[][])
+    {
+        String temp[][]=new String[4][4];
+
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                temp[i][j]=state[i][(i+j)%4];
+            }
+        }
+        return temp;
+    }
+
+
+
+
+    public String[][] MixColumns(String state[][])
+    {
+        int mat[][]={{2,3,1,1},
+                     {1,2,3,1},
+                     {1,1,2,3},
+                     {3,1,1,2}
+                    };
+        
+        String temp[][]=new String[4][4];
+        int irreducible=0x11b;
+        
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                int ansHold=0;
                 for(int k=0;k<4;k++)
                 {
-                    AllKeys[rk][k][j] = words[i+j][k];
+                    int av=mat[i][k];
+                    int bv=Integer.parseInt(state[k][j],16);
+                    int prod=0;
+
+                    if(av==1)
+                    {
+                        prod=bv;
+                    }
+                    else if(av==2)
+                    {
+                        prod=bv<<1;
+                        if(prod>0xff)
+                        {
+                            prod=prod^irreducible;
+                        }
+                    }
+                    else if(av==3)
+                    {
+                        prod=bv<<1;
+                        if(prod>0xff)
+                        {
+                            prod=prod^irreducible;
+                        }
+                        prod^=bv;
+                    }
+
+                    ansHold^=prod;
                 }
+
+                temp[i][j]=String.format("%02X",ansHold);
             }
-            rk++;
         }
 
-        // for(int i=0;i<4;i++)
-        // {
-        //     for(int j=0;j<4;j++)
-        //     {
-        //         System.out.print(km[i][j]+" ");
-        //     }
-        //     System.out.println();
-        // }
-
-        return AllKeys;
+        return temp;
     }
 
 
-    static String HexToBinary(String a)
+    public String encrypt(String plaintext, String key)
     {
-        int val=Integer.parseInt(a,16);
-        String b=String.format("%8s", Integer.toBinaryString(val)).replaceAll(" ", "0");
-        if(b.length()>8)
+        String ans="";
+
+        byte[] pt=StringToBytes(plaintext);
+        byte[] keyBytes=StringToBytes(key);
+
+        pt=EnsureLength(pt, 16);
+        keyBytes=EnsureLength(keyBytes, 16);
+
+        String TextHex=BytesToHex(pt);
+        String keyHex=BytesToHex(keyBytes);
+
+        String PtMat[][]=MakeMatrix(TextHex);
+        String AllKeys[][][]=KeyExpansion(keyHex);
+
+        String key0[][]=AllKeys[0];
+
+        String state[][]=PtMat;
+        state=StateXOR(state, key0);
+
+        for(int i=1;i<=9;i++)
         {
-            b=b.substring(b.length()-8);
+            state=SubBytes(state);
+            state=ShiftRows(state);
+            state=MixColumns(state);
+            state=StateXOR(state, AllKeys[i]);
         }
-        return b;
+
+
+        state=SubBytes(state);
+        state=ShiftRows(state);
+        state=StateXOR(state, AllKeys[10]);
+
+
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                sb.append(state[j][i]);
+            }
+        }
+
+        return sb.toString();
     }
 
 
-            static String[][] StateArray(String pt)
-            {
-                String[][] state=new String[4][4];
-                int idx=0;
-
-                for (int j=0;j<4;j++)
-                {
-                    for (int i=0; i<4; i++)
-                    {
-                        state[i][j] = pt.substring(idx, idx + 2);
-                        idx += 2;
-                    }
-                }
-                return state;
-            }
-
-
-            static String[][] AddRoundKey(String[][] state, String[][] roundKey)
-            {
-                for (int i=0; i<4; i++)
-                {
-                    for (int j=0; j<4; j++)
-                    {
-                        int s = Integer.parseInt(state[i][j], 16);
-                        int k = Integer.parseInt(roundKey[i][j], 16);
-                        state[i][j] = String.format("%02x", s ^ k);
-                    }
-                }
-                return state;
-            }
-
-
-    
-    String encrypt(String message)
+    public String[][] InvShiftRows(String state[][])
     {
-            String messages[]=message.split("\\s+");
-            String plaintextInput=messages[0];
-            String keyInput=messages[1];
-            String encryptedtext="";
-            
-            
-            String plaintext = textToHex(plaintextInput);
-            String keyHex = textToHex(keyInput);
+        String temp[][]=new String[4][4];
 
-            String AllRoundKeys[][][]=KeyExpansion(keyHex);
-            String matrix[][]=new String[4][4];
-
-            String key0[][]=StateArray(keyHex);
-
-            matrix = StateArray(plaintext);
-            matrix = AddRoundKey(matrix, key0);
-
-
-            for(int i=0;i<9;i++)
-            {
-                matrix=SubstituteBytes(matrix);
-                matrix=ShiftRows(matrix);
-                matrix=MixColumns(matrix);
-
-
-                for(int j=0;j<4;j++)
-                {
-                    for(int k=0;k<4;k++)
-                    {
-                        int v1=Integer.parseInt(matrix[j][k],16);
-                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
-                        int v=v1^v2;
-                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
-                        matrix[j][k]=ans;
-                    }   
-                }
-            }
-
-            matrix=SubstituteBytes(matrix);
-            matrix=ShiftRows(matrix);
-            int i=9;
+        for(int i=0;i<4;i++)
+        {
             for(int j=0;j<4;j++)
-                {
-                    for(int k=0;k<4;k++)
-                    {
-                        int v1=Integer.parseInt(matrix[j][k],16);
-                        int v2=Integer.parseInt(AllRoundKeys[i][j][k],16);
-                        int v=v1^v2;
-                        String ans=String.format("%2s",Integer.toHexString(v)).replaceAll(" ","0");
-                        matrix[j][k]=ans;
-                    }   
-                }
-
-            for(i=0;i<4;i++)
             {
-                for(int j=0;j<4;j++)
-                {
-                    encryptedtext+=matrix[j][i];
-                }
+                temp[i][j]=state[i][(4+j-i)%4];
             }
-
-            return encryptedtext;
         }
+        return temp;
+    }
 
 
-        String decrypt(String message)
+    public String[][] InvSubBytes(String state[][])
     {
-            String messages[]=message.split("\\s+");
-            String ciphertextInput=messages[0];
-            String keyInput=messages[1];
-            String decryptedtext="";
-            
-            
-            String ciphertext = ciphertextInput;
-            String keyHex = keyInput;
-
-            String AllRoundKeys[][][]=KeyExpansion(keyHex);
-            String matrix[][]=new String[4][4];
-
-            String key0[][]=StateArray(keyHex);
-
-            matrix = StateArray(ciphertext);
-            
-            
-            matrix = AddRoundKey(matrix, AllRoundKeys[9]);
-            matrix = InvShiftRows(matrix);
-            matrix = InvSubstituteBytes(matrix);
-
-            
-            for (int round = 8; round >= 0; round--)
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
             {
-                matrix = AddRoundKey(matrix, AllRoundKeys[round]);
-                matrix = InvMixColumns(matrix);
-                matrix = InvShiftRows(matrix);
-                matrix = InvSubstituteBytes(matrix);
+                int row=Integer.parseInt(String.valueOf(state[i][j].charAt(0)),16);
+                int col=Integer.parseInt(String.valueOf(state[i][j].charAt(1)),16);
+
+                state[i][j]=InvSBOXFunction(row, col);
             }
+        }
 
-            
-            matrix = AddRoundKey(matrix, key0);
+        return state;
+    }
 
-            for (int col = 0; col < 4; col++)
-                for (int row = 0; row < 4; row++)
-                    decryptedtext += matrix[row][col];
 
-            String plaintext = "";
-            for (int i = 0; i < decryptedtext.length(); i += 2) {
-                String hex = decryptedtext.substring(i, i + 2);
-                plaintext += (char) Integer.parseInt(hex, 16);
+    public String[][] InvMixColumns(String state[][])
+    {
+        int mat[][]={{14,11,13,9},
+                     {9,14,11,13},
+                     {13,9,14,11},
+                     {11,13,9,14}
+                    };
+        
+        String temp[][]=new String[4][4];
+        int irreducible=0x11b;
+        
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                int ansHold=0;
+                for(int k=0;k<4;k++)
+                {
+                    int av=mat[i][k];
+                    int bv=Integer.parseInt(state[k][j],16);
+                    int prod=0;
+
+                    prod=galoisMult(av, bv, irreducible);
+                    ansHold^=prod;
+                }
+
+                temp[i][j]=String.format("%02X",ansHold);
             }
+        }
 
-        return plaintext;
-        }
+        return temp;
+    }
+
+
+    public int galoisMult(int a, int b, int irreducible)
+    {
+        int prod=0;
+        int temp_b=b;
+        
+        for(int i=0;i<8;i++)
+        {
+            if((a & 1) != 0)
+            {
+                prod^=temp_b;
+            }
             
+            int high_bit=(temp_b & 0x80);
+            temp_b=(temp_b << 1) & 0xff;
             
+            if(high_bit != 0)
+            {
+                temp_b^=irreducible;
+            }
+            
+            a>>=1;
         }
+        
+        return prod & 0xff;
+    }
+
+
+    public String decrypt(String ciphertext, String key)
+    {
+        String ans="";
+
+        byte[] ct=HexToBytes(ciphertext);
+        byte[] keyBytes=StringToBytes(key);
+
+        ct=EnsureLength(ct, 16);
+        keyBytes=EnsureLength(keyBytes, 16);
+
+        String TextHex=BytesToHex(ct);
+        String keyHex=BytesToHex(keyBytes);
+
+        String CtMat[][]=MakeMatrix(TextHex);
+        String AllKeys[][][]=KeyExpansion(keyHex);
+
+        String state[][]=CtMat;
+        state=StateXOR(state, AllKeys[10]);
+
+        for(int i=9;i>=1;i--)
+        {
+            state=InvShiftRows(state);
+            state=InvSubBytes(state);
+            state=StateXOR(state, AllKeys[i]);
+            state=InvMixColumns(state);
+        }
+
+        state=InvShiftRows(state);
+        state=InvSubBytes(state);
+        state=StateXOR(state, AllKeys[0]);
+
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<4;i++)
+        {
+            for(int j=0;j<4;j++)
+            {
+                sb.append(state[j][i]);
+            }
+        }
+
+        String plainHex=sb.toString();
+        byte[] plain=HexToBytes(plainHex);
+        return ByteToString(plain);
+    }
+}

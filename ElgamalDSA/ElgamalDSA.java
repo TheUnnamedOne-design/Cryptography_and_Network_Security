@@ -180,10 +180,7 @@ public class ElgamalDSA
         String result="";
         try
         {
-            String key=parts[4];
-    
-            // Just verify the signature without decryption
-            // (decryption requires the exact same key used during encryption)
+            String key=parts[4];54
             
             BigInteger V1=a.modPow(hash, q);
             BigInteger V2=(y.modPow(S1, q).multiply(S1.modPow(S2,q))).mod(q);

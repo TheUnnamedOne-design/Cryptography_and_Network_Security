@@ -22,13 +22,11 @@ public class ServerEncryption
             {
                 while (true) {
 
-                s=in.readUTF();
-                System.out.println("Client Received : "+s);
+                String ciphertext=in.readUTF();
+                System.out.println("Client Received : "+ciphertext);
                 System.out.print("Enter key : ");
                 String key=br.readLine();
-                key=aes.textToHex(key);
-                s=s+" "+key;
-                s=aes.decrypt(s);
+                s=aes.decrypt(ciphertext, key);
                 out.writeUTF(s);
                 System.out.println("Server Decrypted : "+s);
                 }
